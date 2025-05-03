@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
-    id("com.google.devtools.ksp")
 
 }
 
@@ -45,25 +44,12 @@ android {
 
 dependencies {
 
-    implementation(libs.firebase.messaging)
     val nav_version = "2.8.9"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 //    // https://mvnrepository.com/artifact/androidx.lifecycle/lifecycle-livedata
 //    implementation("androidx.lifecycle:lifecycle-livedata:2.8.7")
     //compose runtime - live data
     implementation("androidx.compose.runtime:runtime-livedata:1.7.8")
-
-    //ksp
-    ksp("androidx.room:room-compiler:2.5.0")
-
-    //coil-compose
-    implementation("io.coil-kt:coil-compose:2.6.0")     // stable
-
-
-
-    // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
-    implementation("androidx.compose.material:material-icons-extended:1.7.5")
-
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
 
