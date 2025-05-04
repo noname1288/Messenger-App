@@ -78,7 +78,7 @@ val mockChatRoom = listOf(
         chatId = "user123_user009",
         partnerId = "user009",
         partnerName = "Isabelle Kim",
-        partnerAvatar = "https://randomuser.me/api/portraits/women/9.jpg",
+        partnerAvatar = "https://randomuser.me/api/portraits/women/9.jpg1",
         lastMessage = "Call me later?",
         lastTimestamp = System.currentTimeMillis() - 1 * 60 * 60 * 1000
     ),

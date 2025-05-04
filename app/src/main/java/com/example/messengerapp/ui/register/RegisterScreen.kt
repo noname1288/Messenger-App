@@ -33,32 +33,49 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.messengerapp.core.UIState
 import com.example.messengerapp.navigation.AppRoute
-import com.example.messengerapp.ui.login.AuthState
-import com.example.messengerapp.ui.login.AuthViewModel
+import com.example.messengerapp.ui.AuthViewModel
 import com.example.messengerapp.ui.login.LoadingDialog
 
 @Composable
-fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
+fun RegisterScreen(navController: NavController) {
+    var authViewModel: AuthViewModel = viewModel()
+
+
     var emailInput by remember { mutableStateOf("") }
     var passwordInput by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val authState = authViewModel.authState.observeAsState()
+    val authState = authViewModel.signInState.observeAsState()
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate(AppRoute.HOME)
-            is AuthState.Error -> Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
-            is AuthState.Loading -> showDialog = true
+            is UIState.Loading -> showDialog = true
+            is UIState.Success, UIState.Authenticated -> {
+                showDialog = false
+                navController.navigate(AppRoute.PROFILE)
+
+            }
+            is UIState.Error -> {
+                showDialog = false
+                Toast.makeText(
+                    context,
+                    (authState.value as UIState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+
             else -> Unit
         }
     }
 
-    if (showDialog){
+    if (showDialog) {
         LoadingDialog()
     }
 
@@ -94,9 +111,9 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
             label = { Text("Password") },
             singleLine = true,
             visualTransformation = if (passwordVisibility) {
-                PasswordVisualTransformation()
-            } else {
                 VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             trailingIcon = {
@@ -114,10 +131,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         Spacer(Modifier.height(16.dp))
 
         Button(onClick = {
-            val errorMessage = authViewModel.validateCredentials(emailInput, passwordInput)
-            if (errorMessage != null) {
-                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-            } else { authViewModel.signup(emailInput, passwordInput) }
+            authViewModel.signup(emailInput, passwordInput)
         }) {
             Text("Register")
         }

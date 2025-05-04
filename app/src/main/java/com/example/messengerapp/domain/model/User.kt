@@ -5,6 +5,7 @@ data class User(
     val email: String = "",
     val displayName: String = "",
     val avatarUrl: String = "",
-    val fcmToken: String = ""
+    val fcmToken: String = "",
+    val createdAt: Long = System.currentTimeMillis()
 
 )

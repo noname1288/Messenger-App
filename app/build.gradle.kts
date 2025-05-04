@@ -45,6 +45,7 @@ android {
 
 dependencies {
 
+    implementation(libs.firebase.messaging)
     val nav_version = "2.8.9"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 //    // https://mvnrepository.com/artifact/androidx.lifecycle/lifecycle-livedata
@@ -54,6 +55,11 @@ dependencies {
 
     //ksp
     ksp("androidx.room:room-compiler:2.5.0")
+
+    //coil-compose
+    implementation("io.coil-kt:coil-compose:2.6.0")     // stable
+
+
 
     // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
     implementation("androidx.compose.material:material-icons-extended:1.7.5")

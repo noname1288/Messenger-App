@@ -1,14 +1,13 @@
 package com.example.messengerapp.ui.login
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -44,24 +42,57 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.messengerapp.core.UIState
 import com.example.messengerapp.navigation.AppRoute
+import com.example.messengerapp.ui.AuthViewModel
 
 @Composable
-fun LoginScreen( navController: NavController, authViewModel: AuthViewModel) {
+fun LoginScreen( navController: NavController) {
+    val context = LocalContext.current
+
+    //declare viewmodel
+    //option 1: using popularly in jetpackcompose
+    var authViewModel : AuthViewModel = viewModel()
+    /*
+    * BENEFIT:
+    *Bound to lifecycle of activity
+    *Preservers state during recomposition
+    *Reuses the viewmodel instance
+    * ******
+    * */
+
+//    option2:
+//    val context = LocalContext.current as ComponentActivity
+//    var authViewModel2 = ViewModelProvider(context)[AuthViewModel::.java]
+
     var emailInput by remember{mutableStateOf("")}
     var passwordInput by remember{mutableStateOf("")}
     var passwordVisibility by remember{mutableStateOf(false)}
     var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    val authState = authViewModel.authState.observeAsState()
+
+    val authState = authViewModel.signInState.observeAsState()
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate(AppRoute.HOME)
-            is AuthState.Error -> Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
-            is AuthState.Loading -> showDialog = true
+            is UIState.Authenticated -> {
+                showDialog = false
+                navController.navigate(AppRoute.HOME)
+            }
+            is UIState.Error -> {
+                showDialog = false
+
+                Toast.makeText(
+                    context,
+                    (authState.value as UIState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                Log.e("LoginScreen", (authState.value as UIState.Error).message)
+            }
+            is UIState.Loading -> showDialog = true
             else -> Unit
         }
     }
@@ -108,9 +139,10 @@ fun LoginScreen( navController: NavController, authViewModel: AuthViewModel) {
                 onValueChange = { passwordInput = it },
                 label = { Text("Password") },
                 visualTransformation = if (passwordVisibility) {
-                    PasswordVisualTransformation()
-                } else {
                     VisualTransformation.None
+                } else {
+
+                    PasswordVisualTransformation()
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
@@ -133,10 +165,7 @@ fun LoginScreen( navController: NavController, authViewModel: AuthViewModel) {
 
         //button area
         Button(onClick = {
-            val errorMessage = authViewModel.validateCredentials(emailInput, passwordInput)
-            if (errorMessage != null) {
-                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-            } else { authViewModel.login(emailInput, passwordInput) }
+            authViewModel.login(emailInput, passwordInput)
         }) {
             Text(text = "Login")
         }
