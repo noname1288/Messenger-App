@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +25,7 @@ import com.example.messengerapp.utils.toFriendlyTimeString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(navController: NavController) {
+fun ChatScreen(navController: NavController, chatId: String) {
     val chatViewModel: ChatViewModel = viewModel()
 
     //fake data
@@ -33,19 +34,12 @@ fun ChatScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Chat #") },
+                title = { Text(text = "Chat $chatId") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                     }
                 },
-//                colors = TopAppBarColors(
-//                    containerColor =Color.Red,
-//                    scrolledContainerColor = Color.Red,
-//                    navigationIconContentColor = Color.Red,
-//                    titleContentColor = Color.Red,
-//                    actionIconContentColor = Color.Red
-//                )
             )
         },
         bottomBar = {

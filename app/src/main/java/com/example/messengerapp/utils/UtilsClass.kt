@@ -1,7 +1,12 @@
 package com.example.messengerapp.utils
-import java.time.*
+
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
+
+
 
 // chuyen timestamp sang ngay thang
 fun Long.toFriendlyTimeString(): String {
@@ -19,8 +24,11 @@ fun Long.toFriendlyTimeString(): String {
         duration.toHours() < 6 -> "${duration.toHours()} giờ trước"
         localDateTime.toLocalDate().isEqual(today) ->
             localDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+
         localDateTime.toLocalDate().isEqual(today.minusDays(1)) -> "Hôm qua"
         else ->
             localDateTime.format(DateTimeFormatter.ofPattern("dd/MM"))
     }
 }
+
+

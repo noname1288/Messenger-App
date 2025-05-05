@@ -14,65 +14,107 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Output
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.ImageLoader
-import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import coil.util.DebugLogger
-
-import com.example.messengerapp.R
 import com.example.messengerapp.domain.model.ChatRoom
 import com.example.messengerapp.navigation.AppRoute
-import com.example.messengerapp.ui.AuthViewModel
+import com.example.messengerapp.navigation.safeNavigate
+import com.example.messengerapp.ui.login.AuthViewModel
+import com.example.messengerapp.ui.search.SearchViewModel
 import com.example.messengerapp.utils.toFriendlyTimeString
-import com.google.rpc.context.AttributeContext
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    var homeViewModel: HomeViewModel = viewModel()
-    var authViewModel : AuthViewModel = viewModel()
+    val context = LocalContext.current
 
-    val chatRoomsList = homeViewModel.chatRooms //fake data
+    var searchViewModel: SearchViewModel = viewModel()
+    var authViewModel: AuthViewModel = viewModel()
 
-    LazyColumn {
-        itemsIndexed(
-            items = chatRoomsList,
-            key = { _, chatRoom -> chatRoom.chatId } // optional, improves performance
-        ) { index, chatRoom ->
-            ChatRowItem(item = chatRoom,
-                onClick = {})
-            HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
-        }
-        item {
-            Button(onClick = {
-                authViewModel.logout()
-                navController.navigate(AppRoute.LOGIN)
-            }) {
-                Text("Log out")
+//    val searchState = searchViewModel.searchState.observeAsState()
+    var showLoading by remember { mutableStateOf(false) }
+
+    val chatRoomsList = searchViewModel.chatRooms //fake data
+
+//    if (showLoading) {
+//        LoadingDialog()
+//    }
+//    LaunchedEffect(searchState.value) {
+//        when (searchState.value) {
+//            is UIState.Loading -> showLoading = true
+//            is UIState.Error -> {
+//                showLoading = false
+//                Toast.makeText(context, (searchState.value as UIState.Error).message, Toast.LENGTH_SHORT).show()
+//            }
+//            is UIState.Success ->{
+//                showLoading = false
+//                navController.navigate(AppRoute.CHAT)
+//            }
+//            else -> Unit
+//        }
+//    }
+
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text("Hello You") },
+            actions = {
+                IconButton(onClick = { navController.safeNavigate(AppRoute.SEARCH) }) {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "icon search")
+                }
+                IconButton(onClick = {
+                    authViewModel.logout()
+                    navController.popBackStack(AppRoute.LOGIN, inclusive = false)
+                }) {
+                    Icon(Icons.Default.Output, contentDescription = null)
+                }
+            }
+        )
+    }) { innerpadding ->
+        Box(modifier = Modifier.padding(innerpadding)) {
+            LazyColumn {
+
+                itemsIndexed(
+                    items = chatRoomsList,
+                    key = { _, chatRoom -> chatRoom.chatId } // optional, improves performance
+                ) { index, chatRoom ->
+                    ChatRowItem(
+                        item = chatRoom,
+                        onClick = {})
+                    HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
+                }
             }
         }
     }
 }
-
 
 
 @Composable
@@ -85,7 +127,7 @@ fun ChatRowItem(item: ChatRoom, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 1) Avatar
-        AvatarSection(partnerAvatar = item.partnerAvatar, partnerName =  item.partnerName)
+        AvatarSection(partnerAvatar = item.partnerAvatar, partnerName = item.partnerName)
         // 2) Tên + LastMessage
         Column(
             modifier = Modifier
@@ -110,7 +152,8 @@ fun ChatRowItem(item: ChatRoom, onClick: () -> Unit) {
         Column(horizontalAlignment = Alignment.End) {
             Text(
                 text = item.lastTimestamp.toFriendlyTimeString(),
-                style = MaterialTheme.typography.labelSmall.copy(color = Color.Gray))
+                style = MaterialTheme.typography.labelSmall.copy(color = Color.Gray)
+            )
             Spacer(modifier = Modifier.height(4.dp))
 //            if (item.unreadCount > 0) {
 //                BadgeUnread(count = item.unreadCount)

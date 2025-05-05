@@ -37,7 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.messengerapp.core.UIState
 import com.example.messengerapp.navigation.AppRoute
-import com.example.messengerapp.ui.AuthViewModel
+import com.example.messengerapp.ui.login.AuthViewModel
 import com.example.messengerapp.ui.login.LoadingDialog
 
 @Composable
