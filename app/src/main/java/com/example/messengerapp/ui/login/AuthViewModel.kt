@@ -1,4 +1,4 @@
-package com.example.messengerapp.ui
+package com.example.messengerapp.ui.login
 
 import android.util.Log
 import android.util.Patterns

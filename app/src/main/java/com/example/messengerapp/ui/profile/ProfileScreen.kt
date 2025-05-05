@@ -33,6 +33,7 @@ import androidx.navigation.NavController
 import com.example.messengerapp.core.UIState
 import com.example.messengerapp.domain.model.User
 import com.example.messengerapp.navigation.AppRoute
+import com.example.messengerapp.navigation.safeNavigate
 import com.example.messengerapp.service_locator.AppContainer
 import com.example.messengerapp.ui.login.LoadingDialog
 
@@ -54,7 +55,7 @@ fun ProfileScreen(navController: NavController) {
     LaunchedEffect(profileState.value) {
         when (profileState.value) {
             is UIState.Loading -> showLoading = true
-            is UIState.Success -> navController.navigate(AppRoute.HOME)
+            is UIState.Success -> navController.safeNavigate(AppRoute.HOME)
             is UIState.Error -> Toast.makeText(
                 context,
                 (profileState.value as UIState.Error).message,
@@ -130,8 +131,6 @@ fun ProfileScreen(navController: NavController) {
                     avatarUrl = "hello1.jpg",
                     fcmToken = ""
                 )
-
-
 
                 profileViewModel.createUserProfile(userMock)
             }) {
