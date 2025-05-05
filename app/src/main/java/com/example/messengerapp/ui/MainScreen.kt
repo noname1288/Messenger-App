@@ -21,7 +21,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
     //Theo doi route hien tai
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    LaunchedEffect(Unit){ Log.d("Navigation", "currentRoute: $currentRoute") }
+    LaunchedEffect(currentRoute){ Log.d("Navigation", "currentRoute: $currentRoute") }
 
     Scaffold (
     ){

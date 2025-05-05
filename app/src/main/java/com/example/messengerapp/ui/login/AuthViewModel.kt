@@ -79,7 +79,7 @@ class AuthViewModel : ViewModel() {
         }
 
         try {
-            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            auth.createUserWithEmailAndPassword(email.trim(), password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     _signInState.value = UIState.Authenticated
                 } else {
@@ -99,8 +99,8 @@ class AuthViewModel : ViewModel() {
     //logout user
     fun logout() {
         try {
-            auth.signOut()
             _signInState.value = UIState.Unauthenticated
+            auth.signOut()
         } catch (e: Exception) {
             Log.e("AuthViewModel", "logout: ${e.message}")
         }

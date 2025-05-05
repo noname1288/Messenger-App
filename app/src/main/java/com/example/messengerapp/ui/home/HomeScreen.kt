@@ -27,6 +27,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,45 +56,28 @@ import com.example.messengerapp.utils.toFriendlyTimeString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel, homeViewModel: HomeViewModel) {
     val context = LocalContext.current
 
-    var searchViewModel: SearchViewModel = viewModel()
     var authViewModel: AuthViewModel = viewModel()
 
 //    val searchState = searchViewModel.searchState.observeAsState()
     var showLoading by remember { mutableStateOf(false) }
 
-    val chatRoomsList = searchViewModel.chatRooms //fake data
-
-//    if (showLoading) {
-//        LoadingDialog()
-//    }
-//    LaunchedEffect(searchState.value) {
-//        when (searchState.value) {
-//            is UIState.Loading -> showLoading = true
-//            is UIState.Error -> {
-//                showLoading = false
-//                Toast.makeText(context, (searchState.value as UIState.Error).message, Toast.LENGTH_SHORT).show()
-//            }
-//            is UIState.Success ->{
-//                showLoading = false
-//                navController.navigate(AppRoute.CHAT)
-//            }
-//            else -> Unit
-//        }
-//    }
+    val chatRoomsList by homeViewModel.chatRooms.collectAsState()
 
     Scaffold(topBar = {
         TopAppBar(
-            title = { Text("Hello You") },
+            title = { Text("Hello ${homeViewModel.currentUser}") },
             actions = {
-                IconButton(onClick = { navController.safeNavigate(AppRoute.SEARCH) }) {
+                IconButton(onClick = { navController.navigate(AppRoute.SEARCH) }) {
                     Icon(imageVector = Icons.Default.Search, contentDescription = "icon search")
                 }
                 IconButton(onClick = {
                     authViewModel.logout()
-                    navController.popBackStack(AppRoute.LOGIN, inclusive = false)
+                    navController.navigate(AppRoute.LOGIN) {
+                        popUpTo(0) { inclusive = true } // Xóa toàn bộ stack
+                    }
                 }) {
                     Icon(Icons.Default.Output, contentDescription = null)
                 }

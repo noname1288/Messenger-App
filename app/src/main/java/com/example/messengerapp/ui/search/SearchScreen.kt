@@ -1,5 +1,6 @@
 package com.example.messengerapp.ui.search
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,14 +49,14 @@ import com.example.messengerapp.navigation.AppRoute
 import com.example.messengerapp.navigation.navigateWithArgs
 import com.example.messengerapp.navigation.popBackIfCan
 import com.example.messengerapp.navigation.safeNavigate
+import com.example.messengerapp.service_locator.AppContainer
+import com.example.messengerapp.ui.BaseViewModelFactory
 import com.example.messengerapp.ui.login.LoadingDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavController) {
+fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel) {
     val context = LocalContext.current
-
-    val searchViewModel: SearchViewModel = viewModel()
 
     var query by remember { mutableStateOf("") }
     var showLoading by remember { mutableStateOf(false) }
@@ -91,6 +92,8 @@ fun SearchScreen(navController: NavController) {
                 //navigate to chat Room
                 val chatRoom = state.data
                 navController.navigateWithArgs("CHAT/%s", chatRoom.chatId)
+                searchViewModel.resetAccessState()
+
 
             }
             else -> Unit
@@ -142,6 +145,7 @@ fun SearchScreen(navController: NavController) {
                             .fillMaxWidth()
                             .clickable {
                                 searchViewModel.accessChatWithUser(user)
+                                Log.d("SearchScreen", "User clicked: $user")
                             }
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically

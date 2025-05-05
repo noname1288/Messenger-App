@@ -2,12 +2,16 @@ package com.example.messengerapp.data.source.remote
 
 import com.example.messengerapp.domain.model.ChatRoom
 import com.example.messengerapp.domain.repository.ChatRoomRepository
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class ChatRoomRepositoryImpl(
     private val fireStore: FirebaseFirestore,
-    private val currentUserId: String
+    private val currentUserId: String = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 ) : ChatRoomRepository {
     override suspend fun getChatRoom(chatId: String): Result<ChatRoom> {
         return try {
@@ -34,7 +38,11 @@ class ChatRoomRepositoryImpl(
         }
     }
 
-    override suspend fun createChatRoom(chatRoom: ChatRoom): Result<ChatRoom> {
+    override suspend fun createChatRoom(
+        currentUserId: String,
+        currentUserName: String,
+        currentUserAvatar: String,
+        chatRoom: ChatRoom): Result<ChatRoom> {
         return try {
             val batch = fireStore.batch()
 
@@ -50,14 +58,41 @@ class ChatRoomRepositoryImpl(
                 .collection("rooms")
                 .document(chatRoom.chatId)
 
+            // tuỳ chỉnh thông tin cho partner
+            val reversedRoom = chatRoom.copy(
+                partnerId = currentUserId,
+                partnerName = currentUserName,
+                partnerAvatar = currentUserAvatar
+            )
+
             batch.set(currentUserRef, chatRoom)
-            batch.set(partnerRef, chatRoom) // Có thể tuỳ chỉnh thông tin nếu cần
+            batch.set(partnerRef, reversedRoom) //
 
             batch.commit().await()
 
             Result.success(chatRoom)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override fun observeChatRooms(userId: String): Flow<List<ChatRoom>> = callbackFlow{
+        val listenerRegistration = fireStore.collection("inbox")
+            .document(userId)
+            .collection("rooms")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val rooms = snapshot?.toObjects(ChatRoom::class.java) ?: emptyList()
+
+                trySend(rooms).isSuccess
+            }
+
+        awaitClose {
+            listenerRegistration.remove()
         }
     }
 }
