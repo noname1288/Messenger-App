@@ -63,7 +63,7 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel) {
 
     Scaffold(topBar = {
         TopAppBar(
-            title = { Text("Hello ${SessionManager.currentUser?.displayName ?: "Khong thay"}") },
+            title = { Text("Welcome ${SessionManager.currentUser?.displayName ?: "Khong thay"}") },
             actions = {
                 IconButton(onClick = { navController.safeNavigate(AppRoute.SEARCH) }) {
                     Icon(imageVector = Icons.Default.Search, contentDescription = "icon search")
