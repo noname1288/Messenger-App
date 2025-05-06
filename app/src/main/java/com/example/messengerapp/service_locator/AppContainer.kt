@@ -6,6 +6,7 @@ import com.example.messengerapp.data.source.remote.UserRepositoryImpl
 import com.example.messengerapp.domain.usecase.CreateNewUserUsecase
 import com.example.messengerapp.domain.usecase.GetAllChatRoomsUseCase
 import com.example.messengerapp.domain.usecase.GetOrCreateChatRoomUseCase
+import com.example.messengerapp.domain.usecase.GetUserByUidUseCase
 import com.example.messengerapp.domain.usecase.ObserveMesssageUseCase
 import com.example.messengerapp.domain.usecase.SearchUserUseCase
 import com.example.messengerapp.domain.usecase.SendMessageUseCase
@@ -64,6 +65,10 @@ object AppContainer {
     }
     val getAllChatRoomsUseCase by lazy {
         GetAllChatRoomsUseCase(chatRoomRepository)
+    }
+
+    val getUserByUidUseCase by lazy {
+        GetUserByUidUseCase(userRepository)
     }
 
 

@@ -57,15 +57,17 @@ import com.example.messengerapp.utils.toFriendlyTimeString
 fun ChatScreen(navController: NavController, chatId: String, chatViewModel: ChatViewModel) {
     val context = LocalContext.current
 
-
     var textType by remember { mutableStateOf("") }
 
     //fetch data
     val messages by chatViewModel.messages.collectAsState()
     val sendState by chatViewModel.sendState.collectAsState()
     val listState = rememberLazyListState() //state danh sách tin nhắn -> Muc dich
-    // Tự Scroll xuống cuối khi có tin nhắn mới
 
+    //get partner info
+    val partner by chatViewModel.partner.collectAsState()
+
+    // Tự Scroll xuống cuối khi có tin nhắn mới
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.lastIndex)
@@ -86,10 +88,15 @@ fun ChatScreen(navController: NavController, chatId: String, chatViewModel: Chat
         chatViewModel.listenToMessages(chatId)
     }
 
+    LaunchedEffect(partner) {
+        val partnerId = chatViewModel.extractReceiverId(chatId = chatId, currentUserId =  chatViewModel.currentUser)
+        chatViewModel.getPartnerInfo(partnerId)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Chat $chatId") },
+                title = { Text(text = "Chat with ${partner?.displayName ?: "Khong tim thay"}") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")

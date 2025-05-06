@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
     private var auth: FirebaseAuth = AppContainer.firebaseAuth
-    private var userRepository: UserRepositoryImpl = AppContainer.userRepository
 
     private var _signInState = MutableLiveData<UIState<Unit>>(UIState.Initial)
     val signInState: LiveData<UIState<Unit>> = _signInState

@@ -61,7 +61,8 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 ChatViewModel(
                     currentUserId = currentUserUid,
                     sendMessageUseCase = AppContainer.sendMessageUseCase,
-                    observeMessageUseCase = AppContainer.observeMessageUseCase
+                    observeMessageUseCase = AppContainer.observeMessageUseCase,
+                    getUserByUidUseCase = AppContainer.getUserByUidUseCase
                 )
             }
 
