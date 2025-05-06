@@ -91,10 +91,8 @@ fun SearchScreen(navController: NavController, searchViewModel: SearchViewModel)
                 showLoading = false
                 //navigate to chat Room
                 val chatRoom = state.data
-                navController.navigateWithArgs("CHAT/%s", chatRoom.chatId)
+                navController.navigateWithArgs("CHAT/%s", chatRoom.chatId, popUpToRoute = AppRoute.SEARCH)
                 searchViewModel.resetAccessState()
-
-
             }
             else -> Unit
         }

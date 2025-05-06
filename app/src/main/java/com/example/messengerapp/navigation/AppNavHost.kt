@@ -36,14 +36,6 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(AppRoute.HOME) {
             val currentUid = AppContainer.firebaseAuth.currentUser?.uid.orEmpty()
 
-            val searchViewModelFactory = BaseViewModelFactory {
-                SearchViewModel(
-                    currentUid,
-                    AppContainer.getOrCreateChatRoomUseCase,
-                    AppContainer.searchUserUseCase
-                )
-            }
-
             val homeViewModelFactory = BaseViewModelFactory {
                 HomeViewModel(
                     currentUid,
@@ -51,10 +43,10 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 )
             }
 
-            val searchViewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
             val homeViewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
-            HomeScreen(navController, searchViewModel, homeViewModel)
+            HomeScreen(navController, homeViewModel)
         }
+
         composable(AppRoute.PROFILE) {
             ProfileScreen(navController)
         }
@@ -81,6 +73,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
 
         composable(AppRoute.SEARCH) {
             val currentUid = AppContainer.firebaseAuth.currentUser?.uid.orEmpty()
+
             val viewModelFactory = BaseViewModelFactory {
                 SearchViewModel(
                     currentUid,
@@ -88,6 +81,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                     AppContainer.searchUserUseCase
                 )
             }
+
             val searchViewModel: SearchViewModel = viewModel(factory = viewModelFactory)
             SearchScreen(navController, searchViewModel)
         }

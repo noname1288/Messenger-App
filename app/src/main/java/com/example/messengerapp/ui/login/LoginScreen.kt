@@ -46,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.messengerapp.core.UIState
 import com.example.messengerapp.navigation.AppRoute
+import com.example.messengerapp.navigation.navigateRoot
 import com.example.messengerapp.navigation.safeNavigate
 import com.example.messengerapp.ui.login.AuthViewModel
 
@@ -80,7 +81,7 @@ fun LoginScreen( navController: NavController) {
         when (authState.value) {
             is UIState.Authenticated -> {
                 showDialog = false
-                navController.safeNavigate(AppRoute.HOME)
+                navController.navigateRoot(AppRoute.HOME)
             }
             is UIState.Error -> {
                 showDialog = false
