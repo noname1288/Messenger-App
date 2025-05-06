@@ -64,3 +64,7 @@ fun NavController.navigateOnce(
         safeNavigate(route, popUpToRoute, isInclusive, restore)
     }
 }
+
+fun NavController.navigateRoot(route: String) {
+    navigate(route) { popUpTo(0) { inclusive = true }; launchSingleTop = true }
+}
