@@ -46,6 +46,7 @@ android {
 dependencies {
 
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.functions)
     val nav_version = "2.8.9"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 //    // https://mvnrepository.com/artifact/androidx.lifecycle/lifecycle-livedata
