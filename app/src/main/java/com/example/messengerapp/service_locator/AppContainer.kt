@@ -35,35 +35,35 @@ object AppContainer {
 //        get() = firebaseAuth.currentUser?.uid ?: ""
 
     //repository
-    private  val userRepositoryImpl by lazy {
+      val userRepository by lazy {
         UserRepositoryImpl(firestore)
     }
-    private val chatRoomRepositoryImpl by lazy {
+    private val chatRoomRepository by lazy {
         ChatRoomRepositoryImpl(firestore)
     }
-    private val messageHandleRepositoryImpl by lazy {
+    private val messageHandleRepository by lazy {
         MessageHandleRepositoryImpl(firestore)
     }
 
 
     //usecase
     val createNewUserUsecase by lazy {
-        CreateNewUserUsecase(userRepositoryImpl)
+        CreateNewUserUsecase(userRepository)
     }
     val getOrCreateChatRoomUseCase by lazy {
-        GetOrCreateChatRoomUseCase(chatRoomRepositoryImpl)
+        GetOrCreateChatRoomUseCase(chatRoomRepository)
     }
     val searchUserUseCase by lazy {
-        SearchUserUseCase(userRepositoryImpl)
+        SearchUserUseCase(userRepository)
     }
     val sendMessageUseCase by lazy {
-        SendMessageUseCase(messageHandleRepositoryImpl)
+        SendMessageUseCase(messageHandleRepository)
     }
     val observeMessageUseCase by lazy {
-        ObserveMesssageUseCase(messageHandleRepositoryImpl)
+        ObserveMesssageUseCase(messageHandleRepository)
     }
     val getAllChatRoomsUseCase by lazy {
-        GetAllChatRoomsUseCase(chatRoomRepositoryImpl)
+        GetAllChatRoomsUseCase(chatRoomRepository)
     }
 
 

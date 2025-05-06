@@ -1,5 +1,6 @@
 package com.example.messengerapp.ui.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.messengerapp.core.UIState
 import com.example.messengerapp.domain.model.User
+import com.example.messengerapp.domain.session.SessionManager
 import com.example.messengerapp.navigation.AppRoute
+import com.example.messengerapp.navigation.navigateRoot
 import com.example.messengerapp.navigation.safeNavigate
 import com.example.messengerapp.service_locator.AppContainer
 import com.example.messengerapp.ui.login.LoadingDialog
@@ -55,7 +58,20 @@ fun ProfileScreen(navController: NavController) {
     LaunchedEffect(profileState.value) {
         when (profileState.value) {
             is UIState.Loading -> showLoading = true
-            is UIState.Success -> navController.safeNavigate(AppRoute.HOME)
+            is UIState.Success -> {
+                val uid = AppContainer.firebaseAuth.currentUser?.uid.orEmpty()
+
+                //  Gọi suspend function trong LaunchedEffect
+                val result = SessionManager.fetch(uid, AppContainer.userRepository)
+
+                if (result.isSuccess) {
+                    Log.d("Session", "Lấy được user: ${SessionManager.currentUser}")
+                    navController.navigateRoot(AppRoute.HOME) //  chỉ navigate khi đã fetch xong
+                } else {
+                    Toast.makeText(context, "Không lấy được thông tin user", Toast.LENGTH_SHORT).show()
+                    Log.e("Session", "Không lấy được user: ${result.exceptionOrNull()?.message}")
+                }
+            }
             is UIState.Error -> Toast.makeText(
                 context,
                 (profileState.value as UIState.Error).message,

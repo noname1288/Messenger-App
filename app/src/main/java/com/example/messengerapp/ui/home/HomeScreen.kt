@@ -46,6 +46,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.messengerapp.domain.model.ChatRoom
+import com.example.messengerapp.domain.session.SessionManager
 import com.example.messengerapp.navigation.AppRoute
 import com.example.messengerapp.navigation.navigateRoot
 import com.example.messengerapp.navigation.safeNavigate
@@ -62,7 +63,7 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeViewModel) {
 
     Scaffold(topBar = {
         TopAppBar(
-            title = { Text("Hello ${homeViewModel.currentUser}") },
+            title = { Text("Hello ${SessionManager.currentUser?.displayName ?: "Khong thay"}") },
             actions = {
                 IconButton(onClick = { navController.safeNavigate(AppRoute.SEARCH) }) {
                     Icon(imageVector = Icons.Default.Search, contentDescription = "icon search")

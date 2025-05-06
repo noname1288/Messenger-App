@@ -16,11 +16,19 @@ class MessageHandleRepositoryImpl (private val fireStore: FirebaseFirestore) : M
         return try {
             val currentUserUid = AppContainer.firebaseAuth.currentUser?.uid.orEmpty()
 
-            val chatRef = fireStore.collection("chats").document(mess.chatId)
+            val chatRef = fireStore.collection("chats").document(mess.chatId) //sender
+
             val messageRef = chatRef.collection("messages").document()
             val finalMessage = mess.copy(id = messageRef.id)
 
-            val inboxRef = fireStore.collection("inbox").document(currentUserUid).collection("rooms").document(mess.chatId)
+            val inboxRef = fireStore.collection("inbox") //sender
+                .document(currentUserUid)
+                .collection("rooms")
+                .document(mess.chatId)
+            val receiverInboxRef = fireStore.collection("inbox") //receiver
+                .document(mess.receiverId)
+                .collection("rooms")
+                .document(mess.chatId)
 
             val batch = fireStore.batch()
             //add message to chat
@@ -42,6 +50,7 @@ class MessageHandleRepositoryImpl (private val fireStore: FirebaseFirestore) : M
 
             batch.set(chatRef,chatUpdate, SetOptions.merge())
             batch.set(inboxRef,inboxUpdate, SetOptions.merge())
+            batch.set(receiverInboxRef, inboxUpdate, SetOptions.merge())
 
 
             batch.commit().await()

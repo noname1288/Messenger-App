@@ -5,16 +5,22 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.messengerapp.core.UIState
+import com.example.messengerapp.data.source.remote.UserRepositoryImpl
+import com.example.messengerapp.domain.repository.UserRepository
+import com.example.messengerapp.domain.session.SessionManager
 import com.example.messengerapp.service_locator.AppContainer
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
     private var auth: FirebaseAuth = AppContainer.firebaseAuth
+    private var userRepository: UserRepositoryImpl = AppContainer.userRepository
 
     private var _signInState = MutableLiveData<UIState<Unit>>(UIState.Initial)
     val signInState: LiveData<UIState<Unit>> = _signInState
@@ -79,18 +85,19 @@ class AuthViewModel : ViewModel() {
         }
 
         try {
-            auth.createUserWithEmailAndPassword(email.trim(), password).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _signInState.value = UIState.Authenticated
-                } else {
-                    val errorMsg = when (val ex = task.exception) {
-                        is FirebaseAuthUserCollisionException -> "Email đã được đăng ký"
-                        is FirebaseAuthWeakPasswordException -> "Mật khẩu quá yếu"
-                        else -> ex?.localizedMessage ?: "Đăng ký thất bại"
+            auth.createUserWithEmailAndPassword(email.trim(), password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        _signInState.value = UIState.Authenticated
+                    } else {
+                        val errorMsg = when (val ex = task.exception) {
+                            is FirebaseAuthUserCollisionException -> "Email đã được đăng ký"
+                            is FirebaseAuthWeakPasswordException -> "Mật khẩu quá yếu"
+                            else -> ex?.localizedMessage ?: "Đăng ký thất bại"
+                        }
+                        _signInState.value = UIState.Error(errorMsg)
                     }
-                    _signInState.value = UIState.Error(errorMsg)
                 }
-            }
         } catch (e: Exception) {
             Log.e("AuthViewModel", "sign up: ${e.message}")
         }
@@ -100,10 +107,12 @@ class AuthViewModel : ViewModel() {
     fun logout() {
         try {
             _signInState.value = UIState.Unauthenticated
+            SessionManager.currentUser = null
             auth.signOut()
         } catch (e: Exception) {
             Log.e("AuthViewModel", "logout: ${e.message}")
         }
     }
+
 
 }

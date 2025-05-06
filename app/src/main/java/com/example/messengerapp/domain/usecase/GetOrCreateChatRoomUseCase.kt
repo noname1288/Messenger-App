@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.messengerapp.domain.model.ChatRoom
 import com.example.messengerapp.domain.model.User
 import com.example.messengerapp.domain.repository.ChatRoomRepository
+import com.example.messengerapp.domain.session.SessionManager
 import com.example.messengerapp.service_locator.AppContainer
 
 class GetOrCreateChatRoomUseCase(
@@ -11,8 +12,8 @@ class GetOrCreateChatRoomUseCase(
 ) {
     suspend operator fun invoke(myId: String, partner: User): Result<ChatRoom> {
         //todo session management
-        val currentUserName = ""
-        val currentUserAvatar = ""
+        val currentUserName = SessionManager.currentUser?.displayName ?: ""
+        val currentUserAvatar = SessionManager.currentUser?.avatarUrl ?:""
 
         val chatId = generateChatId(myId, partner.uid)
 
