@@ -21,9 +21,9 @@
         android:theme="@style/Theme.MessengerApp"
         tools:targetApi="31">
         <service
-            android:name=".service_locator.MyService"
+            android:name=".service.fcm.MyFirebaseMessagingService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

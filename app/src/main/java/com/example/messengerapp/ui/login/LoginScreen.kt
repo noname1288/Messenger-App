@@ -80,38 +80,56 @@ fun LoginScreen( navController: NavController) {
 
     val authState = authViewModel.signInState.observeAsState()
 
-    LaunchedEffect(authState.value) {
-        when (authState.value) {
-            is UIState.Authenticated -> {
-                showDialog = false
-                val uid = AppContainer.firebaseAuth.currentUser?.uid.orEmpty()
 
-                //  Gọi suspend function trong LaunchedEffect
+// 👇 xử lý điều hướng sau khi login thành công
+    authState.value?.let { state ->
+        if (state is UIState.Authenticated) {
+            showDialog = false
+            val uid = AppContainer.firebaseAuth.currentUser?.uid.orEmpty()
+
+            LaunchedEffect(uid) {
                 val result = SessionManager.fetch(uid, AppContainer.userRepository)
-
                 if (result.isSuccess) {
-                    Log.d("Session", "Lấy được user: ${SessionManager.currentUser}")
-                    navController.navigateRoot(AppRoute.HOME) //  chỉ navigate khi đã fetch xong
+                    navController.navigateRoot(AppRoute.HOME)
                 } else {
                     Toast.makeText(context, "Không lấy được thông tin user", Toast.LENGTH_SHORT).show()
-                    Log.e("Session", "Không lấy được user: ${result.exceptionOrNull()?.message}")
                 }
             }
-            is UIState.Error -> {
-                showDialog = false
-
-                Toast.makeText(
-                    context,
-                    (authState.value as UIState.Error).message,
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                Log.e("LoginScreen", (authState.value as UIState.Error).message)
-            }
-            is UIState.Loading -> showDialog = true
-            else -> Unit
         }
     }
+
+//    LaunchedEffect(authState.value) {
+//        when (authState.value) {
+//            is UIState.Authenticated -> {
+//                showDialog = false
+//                val uid = AppContainer.firebaseAuth.currentUser?.uid.orEmpty()
+//
+//                //  Gọi suspend function trong LaunchedEffect
+//                val result = SessionManager.fetch(uid, AppContainer.userRepository)
+//
+//                if (result.isSuccess) {
+////                    Log.d("Session", "Lấy được user: ${SessionManager.currentUser}")
+//                    navController.navigateRoot(AppRoute.HOME) //  chỉ navigate khi đã fetch xong
+//                } else {
+//                    Toast.makeText(context, "Không lấy được thông tin user", Toast.LENGTH_SHORT).show()
+////                    Log.e("Session", "Không lấy được user: ${result.exceptionOrNull()?.message}")
+//                }
+//            }
+//            is UIState.Error -> {
+//                showDialog = false
+//
+//                Toast.makeText(
+//                    context,
+//                    (authState.value as UIState.Error).message,
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//
+//                Log.e("LoginScreen", (authState.value as UIState.Error).message)
+//            }
+//            is UIState.Loading -> showDialog = true
+//            else -> Unit
+//        }
+//    }
 
     if (showDialog){
         LoadingDialog()

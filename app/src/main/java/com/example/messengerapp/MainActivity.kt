@@ -1,57 +1,52 @@
 package com.example.messengerapp
 
-import android.content.pm.PackageManager
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.messengerapp.ui.MainScreen
 import com.example.messengerapp.ui.theme.MessengerAppTheme
-import android.Manifest
-import androidx.compose.runtime.LaunchedEffect
 
 class MainActivity : ComponentActivity() {
-    // Declare the launcher at the top of your Activity/Fragment:
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            postNotification()
-        } else {
-            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                postNotification()
-            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                showMessage("Permission needed")
-            } else {
-                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-    }
-
-    private fun showMessage(string: String) {}
-
-    private fun postNotification() {
-        TODO("Not yet implemented")
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        createNotificationChannel(this)
+
         setContent {
             MessengerAppTheme {
                 MainScreen()
             }
+        }
+    }
+
+    fun createNotificationChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "chat_channel",                       // channelId
+                "Chat Messages",                      // channelName (hiện trong cài đặt)
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Channel for chat message notifications"
+                enableLights(true)
+                enableVibration(true)
+                setSound(
+                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                    Notification.AUDIO_ATTRIBUTES_DEFAULT
+                )
+            }
+            channel.description = "Thông báo tin nhắn"
+
+            val manager = context.getSystemService(NotificationManager::class.java)
+            manager?.createNotificationChannel(channel)
         }
     }
 }

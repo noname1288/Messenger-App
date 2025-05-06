@@ -10,6 +10,7 @@ import com.example.messengerapp.core.UIState
 import com.example.messengerapp.data.source.remote.UserRepositoryImpl
 import com.example.messengerapp.domain.repository.UserRepository
 import com.example.messengerapp.domain.session.SessionManager
+import com.example.messengerapp.service.fcm.MyFirebaseMessagingService
 import com.example.messengerapp.service_locator.AppContainer
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -49,6 +50,9 @@ class AuthViewModel : ViewModel() {
         try {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    //update fcm_token on login while app is running
+                    MyFirebaseMessagingService.uploadTokenIfNeeded()
+
                     _signInState.value = UIState.Authenticated
                 } else {
                     val message = when (val e = task.exception) {
@@ -87,6 +91,9 @@ class AuthViewModel : ViewModel() {
             auth.createUserWithEmailAndPassword(email.trim(), password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        //update fcm_token on login while app is running
+                        MyFirebaseMessagingService.uploadTokenIfNeeded()
+
                         _signInState.value = UIState.Authenticated
                     } else {
                         val errorMsg = when (val ex = task.exception) {
@@ -105,6 +112,9 @@ class AuthViewModel : ViewModel() {
     //logout user
     fun logout() {
         try {
+            //delete fcm_token on logout
+            MyFirebaseMessagingService.deleteTokenOnLogout()
+
             _signInState.value = UIState.Unauthenticated
             SessionManager.currentUser = null
             auth.signOut()

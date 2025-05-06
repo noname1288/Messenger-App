@@ -144,7 +144,7 @@ fun ProfileScreen(navController: NavController) {
                     uid = currentUser?.uid.toString(),
                     email = currentUser?.email.toString(),
                     displayName = displayNameInput,
-                    avatarUrl = "hello1.jpg",
+                    avatarUrl = "",
                     fcmToken = ""
                 )
 
