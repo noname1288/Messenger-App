@@ -1,7 +1,9 @@
-*Entity*
 
-**Auth & Profile**
+# 📱 Firebase Messaging App – Data Models & Use Cases
 
+## 1. 🔐 Auth & Profile
+
+```kotlin
 data class User(
     val uid: String = "",
     val email: String = "",
@@ -9,11 +11,11 @@ data class User(
     val avatarUrl: String = "",
     val fcmToken: String = ""
 )
+````
 
----
+## 2. 💬 Messaging
 
-**Messaging**
-
+```kotlin
 data class Message(
     val id: String = "",
     val chatId: String = "",          // uidA_uidB (sorted)
@@ -25,11 +27,7 @@ data class Message(
     val timestamp: Long = System.currentTimeMillis()
 )
 
----
-
-**ChatRoom**
-
-data class ChatRoom(               // để hiển thị “recent chat”
+data class ChatRoom( // Hiển thị “recent chat”
     val chatId: String = "",
     val partnerId: String = "",
     val partnerName: String = "",
@@ -37,11 +35,13 @@ data class ChatRoom(               // để hiển thị “recent chat”
     val lastMessage: String = "",
     val lastTimestamp: Long = 0
 )
+```
 
 ---
 
-*Data Struct*
+## 3. 🧩 Firestore Structure
 
+```
 users (COLLECTION)
   └─ {uid} (DOCUMENT)
         • email
@@ -56,26 +56,28 @@ chats (COLLECTION)
         • lastMessage: "👍"
         • lastTimestamp: 1714800000000
         └─ messages (SUB‑COLLECTION)
-             └─ {messageId} (DOCUMENT)  → schema = Message ở trên
+             └─ {messageId} (DOCUMENT)
+                 → schema = Message
 
 inbox (COLLECTION)
-  └─ {uid} (~userUID ; DOCUMENT placeholder)
+  └─ {uid} (DOCUMENT)
         └─ rooms (SUB‑COLLECTION)
-             └─ {chatId} (DOCUMENT)     → schema = ChatRoom
-
+             └─ {chatId} (DOCUMENT)
+                 → schema = ChatRoom
+```
 
 ---
 
-*USE CASE (đã hoàn thanh)*
+## 4. ✅ Use Cases Overview
 
-| UC                    | Màn hình / ViewModel | Trạng thái nên dùng                                                   | `T` trong `Success<T>` nên là…            | Giải thích ngắn gọn                                   |
-| --------------------- | -------------------- | --------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------- |
-| 01 Đăng ký            | `AuthViewModel`      | `UIState<Unit>`                                                       | `Unit`                                    | Chỉ cần biết “OK” hay “Error”.                        |
-| 02 Tạo/cập nhật hồ sơ | `ProfileViewModel`   | `UIState<User>`                                                       | `User` (domain model)                     | Trả ngay hồ sơ để vẽ lại avatar, tên…                 |
-| 03 Đăng nhập          | `AuthViewModel`      | `UIState<FirebaseUser>` *(hoặc)* `UIState<Pair<FirebaseUser,String>>` | `FirebaseUser` **hoặc** `(user, idToken)` | Tuỳ bạn có cần token trên UI không.                   |
-| 04 Tìm người          | `SearchViewModel`    | `UIState<List<User>>`                                                 | `List<User>`                              | Trả về list để hiển thị kết quả tìm kiếm.             |
-| 05 Chat 1‑1 (Gửi)     | `ChatViewModel`      | `UIState<Unit>`                                                       | `Unit`                                    | Bấm “Send” → chỉ cần Loading / Error / Success(Unit). |
-| 05 Chat 1‑1 (Nhận)    | `ChatViewModel`      | **Không dùng `UIState`** → `StateFlow<List<Message>>`                 | —                                         | Luồng real‑time, cứ push list mới.                    |
-| 06 Inbox gần đây      | `InboxViewModel`     | **Không dùng `UIState`** → `StateFlow<List<Thread>>`                  | —                                         | Cũng là real‑time, lắng nghe thường trực.             |
+| Use Case                | ViewModel          | State Management                                                  | `T` in `Success<T>`                   | Description                               |
+| ----------------------- | ------------------ | ----------------------------------------------------------------- | ------------------------------------- | ----------------------------------------- |
+| 01 – Đăng ký            | `AuthViewModel`    | `UIState<Unit>`                                                   | `Unit`                                | Chỉ cần biết thành công/thất bại.         |
+| 02 – Tạo/Cập nhật hồ sơ | `ProfileViewModel` | `UIState<User>`                                                   | `User`                                | Trả về `User` để cập nhật UI.             |
+| 03 – Đăng nhập          | `AuthViewModel`    | `UIState<FirebaseUser>` hoặc `UIState<Pair<FirebaseUser,String>>` | `FirebaseUser` hoặc `(user, idToken)` | Tuỳ vào việc UI có cần token hay không.   |
+| 04 – Tìm người          | `SearchViewModel`  | `UIState<List<User>>`                                             | `List<User>`                          | Hiển thị kết quả tìm kiếm.                |
+| 05 – Gửi tin nhắn       | `ChatViewModel`    | `UIState<Unit>`                                                   | `Unit`                                | Chỉ cần biết gửi thành công hay chưa.     |
+| 05 – Nhận tin nhắn      | `ChatViewModel`    | `StateFlow<List<Message>>` *(realtime)*                           | —                                     | Dùng luồng realtime để cập nhật liên tục. |
+| 06 – Inbox gần đây      | `InboxViewModel`   | `StateFlow<List<Thread>>` *(realtime)*                            | —                                     | Lắng nghe các cuộc trò chuyện mới nhất.   |
 
 
