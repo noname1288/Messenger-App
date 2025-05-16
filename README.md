@@ -1,13 +1,18 @@
-// --------------- Auth & Profile ---------------
+*Entity*
+
+**Auth & Profile**
+
 data class User(
     val uid: String = "",
     val email: String = "",
     val displayName: String = "",
     val avatarUrl: String = "",
     val fcmToken: String = ""
-)
 
-// --------------- Messaging ---------------
+---
+
+**Messaging**
+
 data class Message(
     val id: String = "",
     val chatId: String = "",          // uidA_uidB (sorted)
@@ -19,6 +24,10 @@ data class Message(
     val timestamp: Long = System.currentTimeMillis()
 )
 
+---
+
+**ChatRoom**
+
 data class ChatRoom(               // để hiển thị “recent chat”
     val chatId: String = "",
     val partnerId: String = "",
@@ -28,8 +37,10 @@ data class ChatRoom(               // để hiển thị “recent chat”
     val lastTimestamp: Long = 0
 )
 
+---
 
-*******************************
+*Data Struct*
+
 users (COLLECTION)
   └─ {uid} (DOCUMENT)
         • email
@@ -52,8 +63,10 @@ inbox (COLLECTION)
              └─ {chatId} (DOCUMENT)     → schema = ChatRoom
 
 
-*******************************
-USSE CASE (đã hoàn thanh)
+---
+
+*USSE CASE (đã hoàn thanh)*
+
 | UC                    | Màn hình / ViewModel | Trạng thái nên dùng                                                   | `T` trong `Success<T>` nên là…            | Giải thích ngắn gọn                                   |
 | --------------------- | -------------------- | --------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------- |
 | 01 Đăng ký            | `AuthViewModel`      | `UIState<Unit>`                                                       | `Unit`                                    | Chỉ cần biết “OK” hay “Error”.                        |
