@@ -8,6 +8,7 @@ data class User(
     val displayName: String = "",
     val avatarUrl: String = "",
     val fcmToken: String = ""
+)
 
 ---
 
@@ -65,7 +66,7 @@ inbox (COLLECTION)
 
 ---
 
-*USSE CASE (đã hoàn thanh)*
+*USE CASE (đã hoàn thanh)*
 
 | UC                    | Màn hình / ViewModel | Trạng thái nên dùng                                                   | `T` trong `Success<T>` nên là…            | Giải thích ngắn gọn                                   |
 | --------------------- | -------------------- | --------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------- |
