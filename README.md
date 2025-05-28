@@ -1,6 +1,6 @@
 # 📱 Firebase Messaging App – Android Kotlin + Firebase Realtime Chat
 
-Ứng dụng nhắn tin thời gian thực sử dụng Firebase, hỗ trợ đăng ký, đăng nhập, quản lý hồ sơ, gửi và nhận tin nhắn, cập nhật cuộc trò chuyện gần nhất và tích hợp thông báo đẩy (FCM).
+Ứng dụng nhắn tin thời gian thực sử dụng Firebase, hỗ trợ đăng ký, đăng nhập, gửi và nhận tin nhắn, cập nhật cuộc trò chuyện gần nhất và tích hợp thông báo đẩy (FCM).
 
 ---
 
