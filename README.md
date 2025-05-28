@@ -1,8 +1,12 @@
+# 📱 Firebase Messaging App – Android Kotlin + Firebase Realtime Chat
 
-# 📱 Firebase Messaging App – Data Models & Use Cases
+Ứng dụng nhắn tin thời gian thực sử dụng Firebase, hỗ trợ đăng ký, đăng nhập, quản lý hồ sơ, gửi và nhận tin nhắn, cập nhật cuộc trò chuyện gần nhất và tích hợp thông báo đẩy (FCM).
 
-## 1. 🔐 Auth & Profile
+---
 
+## 🧩 Data Models
+
+### 🔐 1. Auth & Profile
 ```kotlin
 data class User(
     val uid: String = "",
@@ -13,7 +17,7 @@ data class User(
 )
 ````
 
-## 2. 💬 Messaging
+### 💬 2. Messaging
 
 ```kotlin
 data class Message(
@@ -27,7 +31,7 @@ data class Message(
     val timestamp: Long = System.currentTimeMillis()
 )
 
-data class ChatRoom( // Hiển thị “recent chat”
+data class ChatRoom(
     val chatId: String = "",
     val partnerId: String = "",
     val partnerName: String = "",
@@ -39,45 +43,77 @@ data class ChatRoom( // Hiển thị “recent chat”
 
 ---
 
-## 3. 🧩 Firestore Structure
+## 🗂️ Firestore Structure
 
-```
+```plaintext
 users (COLLECTION)
-  └─ {uid} (DOCUMENT)
-        • email
-        • displayName
-        • avatarUrl
-        • fcmToken
-        • createdAt
+ └─ {uid} (DOCUMENT)
+     • email, displayName, avatarUrl, fcmToken, createdAt
 
 chats (COLLECTION)
-  └─ {chatId = uidSmall_uidBig} (DOCUMENT)
-        • participants: [uidA, uidB]
-        • lastMessage: "👍"
-        • lastTimestamp: 1714800000000
-        └─ messages (SUB‑COLLECTION)
-             └─ {messageId} (DOCUMENT)
-                 → schema = Message
+ └─ {chatId = uidSmall_uidBig} (DOCUMENT)
+     • participants: [uidA, uidB]
+     • lastMessage, lastTimestamp
+     └─ messages (SUB-COLLECTION)
+         └─ {messageId} → schema = Message
 
 inbox (COLLECTION)
-  └─ {uid} (DOCUMENT)
-        └─ rooms (SUB‑COLLECTION)
-             └─ {chatId} (DOCUMENT)
-                 → schema = ChatRoom
+ └─ {uid} (DOCUMENT)
+     └─ rooms (SUB-COLLECTION)
+         └─ {chatId} → schema = ChatRoom
 ```
 
 ---
 
-## 4. ✅ Use Cases Overview
+## ✅ Use Cases & ViewModels
 
-| Use Case                | ViewModel          | State Management                                                  | `T` in `Success<T>`                   | Description                               |
-| ----------------------- | ------------------ | ----------------------------------------------------------------- | ------------------------------------- | ----------------------------------------- |
-| 01 – Đăng ký            | `AuthViewModel`    | `UIState<Unit>`                                                   | `Unit`                                | Chỉ cần biết thành công/thất bại.         |
-| 02 – Tạo/Cập nhật hồ sơ | `ProfileViewModel` | `UIState<User>`                                                   | `User`                                | Trả về `User` để cập nhật UI.             |
-| 03 – Đăng nhập          | `AuthViewModel`    | `UIState<FirebaseUser>` hoặc `UIState<Pair<FirebaseUser,String>>` | `FirebaseUser` hoặc `(user, idToken)` | Tuỳ vào việc UI có cần token hay không.   |
-| 04 – Tìm người          | `SearchViewModel`  | `UIState<List<User>>`                                             | `List<User>`                          | Hiển thị kết quả tìm kiếm.                |
-| 05 – Gửi tin nhắn       | `ChatViewModel`    | `UIState<Unit>`                                                   | `Unit`                                | Chỉ cần biết gửi thành công hay chưa.     |
-| 05 – Nhận tin nhắn      | `ChatViewModel`    | `StateFlow<List<Message>>` *(realtime)*                           | —                                     | Dùng luồng realtime để cập nhật liên tục. |
-| 06 – Inbox gần đây      | `InboxViewModel`   | `StateFlow<List<Thread>>` *(realtime)*                            | —                                     | Lắng nghe các cuộc trò chuyện mới nhất.   |
+| #  | Use Case            | ViewModel        | State Management                      | Trả về (`Success<T>`) | Ghi chú                                |
+| -- | ------------------- | ---------------- | ------------------------------------- | --------------------- | -------------------------------------- |
+| 01 | Đăng ký             | AuthViewModel    | UIState<Unit>                         | Unit                  | Chỉ cần biết thành công/thất bại       |
+| 02 | Tạo/Cập nhật hồ sơ  | ProfileViewModel | UIState<User>                         | User                  | Trả về User để cập nhật UI             |
+| 03 | Đăng nhập           | AuthViewModel    | UIState<FirebaseUser> hoặc Pair       | FirebaseUser / Pair   | Tuỳ thuộc vào UI có cần token          |
+| 04 | Tìm người           | SearchViewModel  | UIState\<List<User>>                  | List<User>            | Hiển thị kết quả tìm kiếm              |
+| 05 | Gửi tin nhắn        | ChatViewModel    | UIState<Unit>                         | Unit                  | Xác nhận gửi thành công                |
+| 06 | Nhận tin nhắn       | ChatViewModel    | `StateFlow<List<Message>>` (Realtime) | —                     | Tự động cập nhật realtime              |
+| 07 | Xem hộp thư (Inbox) | InboxViewModel   | `StateFlow<List<Thread>>` (Realtime)  | —                     | Lắng nghe các cuộc trò chuyện mới nhất |
 
+---
 
+## 🔧 Công nghệ sử dụng
+
+* **Kotlin + Jetpack Compose**
+* **Firebase Authentication**
+* **Firebase Firestore (Realtime & Subcollection)**
+* **Firebase Cloud Messaging (FCM)**
+* **Cloud Functions for Push Notifications**
+* **StateFlow + ViewModel + Clean MVVM Architecture**
+* **Navigation Compose, Android Permissions, PendingIntent, Notification**
+
+---
+
+## 📦 Tính năng nổi bật
+
+* Gửi và nhận tin nhắn realtime
+* Thông báo đẩy khi có tin nhắn mới
+* Tìm kiếm người dùng và tạo cuộc trò chuyện mới
+* Cập nhật avatar, tên hiển thị và FCM token người dùng
+* Giao diện Compose hiện đại, điều hướng đa màn hình
+
+---
+
+## 🧪 Cấu trúc Project (rút gọn)
+
+```
+├── core 
+├── data
+│   ├── remote/api, dto, repository
+├── domain
+│   ├── entity, repository, usecase, session
+├── ui
+│   ├── login, register, message, inbox, profile, ..., theme
+├── service_locator
+├── utils
+├── navigation
+```
+
+---
